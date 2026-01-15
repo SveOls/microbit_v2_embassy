@@ -1,0 +1,61 @@
+# cargo-features = ["panic-immediate-abort"] binary size!!!
+
+[package]
+name = "mypros"
+version = "0.1.0"
+edition = "2024"
+
+
+[[bin]]
+name = "blinker"
+path = "src/bin/blinker.rs"
+test = false
+
+[[bin]]
+name = "hello"
+path = "src/bin/hello.rs"
+test = false
+
+[[bin]]
+name = "touch"
+path = "src/bin/touch.rs"
+test = false
+
+[[bin]]
+name = "timer"
+path = "src/bin/timer_communication.rs"
+test = false
+
+[[bin]]
+name = "number"
+path = "src/bin/number.rs"
+test = false
+
+[dependencies]
+defmt = "1.0"
+defmt-rtt = "1.0"
+panic-probe = { version = "1.0", features = ["print-defmt"] }
+semihosting = "0.1.20"
+# TODO(4) enter your HAL here
+embassy-nrf = { version = "0.9.0", features = ["defmt", "gpiote", "time", "nrf52833", "unstable-pac", "time-driver-rtc1"] }
+embassy-executor = { version = "0.9.0", features = ["arch-cortex-m", "executor-thread", "executor-interrupt", "defmt"] }
+embassy-time = { version = "0.5.0", features = ["defmt", "defmt-timestamp-uptime", "tick-hz-32_768"] }
+cortex-m = { version = "0.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7"
+nrf52833-hal = "0.19.0"
+embassy-sync = "0.7.2"
+static_cell = "2.1.1"
+embassy-futures = "0.1.2"
+lsm303agr = { version = "1.1.0", features = ["async"]}
+
+[profile.dev]
+opt-level = 's'
+codegen-units = 1
+
+[profile.release]
+opt-level = 's'
+codegen-units = 1
+lto = 'thin'
+debug = true
+incremental = false
+# panic = "immediate-abort" binary size!!!

@@ -1,0 +1,46 @@
+#![no_std]
+#![no_main]
+
+use embassy_executor::Spawner;
+use embassy_nrf::twim::{Config, Twim};
+use embassy_time::Timer;
+use mypros::{self as _, *};
+
+const ACCEL_ADDR: u8 = 0b0011001;
+const MAGNET_ADDR: u8 = 0b0011110;
+
+const ACCEL_ID_REG: u8 = 0x0f;
+const MAGNET_ID_REG: u8 = 0x4f;
+
+#[embassy_executor::main]
+async fn main(spawner: Spawner) {
+    let p = embassy_nrf::init(Default::default());
+
+    let mut data = [0u8; 100];
+
+    static RAM_BUFFER: static_cell::ConstStaticCell<[u8; 16]> =
+        static_cell::ConstStaticCell::new([0; 16]);
+    let mut aa = Twim::new(
+        p.TWISPI0,
+        Irqs,
+        p.P0_16,
+        p.P0_08,
+        Config::default(),
+        RAM_BUFFER.take(),
+    );
+    let mut mag = [0];
+    let mut acc = [0];
+    loop {
+        aa.blocking_write_read(ACCEL_ADDR, &[ACCEL_ID_REG], &mut acc)
+            .unwrap();
+        defmt::println!("{}", acc);
+        aa.write_read(MAGNET_ADDR, &[MAGNET_ID_REG], &mut mag)
+            .await
+            .unwrap();
+        // let oo = i2s::I2S::new_master(p.I2S, Irqs);
+        defmt::println!("{}", mag);
+        Timer::after_secs(2).await;
+        let a = Timer::after_secs(2);
+        let b = Timer::after_secs(2);
+    }
+}
