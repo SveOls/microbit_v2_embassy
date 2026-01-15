@@ -11,6 +11,7 @@ pub type ButtonReceiver = Receiver<'static, ThreadModeRawMutex, ButtonPress, 64>
 #[embassy_executor::task(pool_size = 2)]
 /// Waits for button events and sends them to the ButtonPress event. This is to be able to poll for
 /// both keys at once.
+/// UPDATE: REMEMBER TO REWORK TO FIT futures::select()!!
 pub async fn button(send: ButtonPress, snd: ButtonSender, b: Peri<'static, AnyPin>) {
     let mut b = Input::new(b, Pull::Up);
     loop {
