@@ -50,7 +50,11 @@ async fn main(spawner: Spawner) {
 async fn i2c_t(aa: Twim<'static>, transmitter: &'static WriteType) {
     let mut sensor = Lsm303agr::new_with_i2c(aa);
     defmt::println!("ge");
-    sensor.init().await.unwrap();
+    match sensor.init().await {
+        Ok(_) => defmt::println!("Ok"),
+        Err(_) => defmt::println!("Err"),
+    }
+    // sensor.init().await.unwrap();
     // let a: Delay = timer0.into();
     defmt::println!("ge");
     sensor
@@ -125,8 +129,15 @@ async fn mag_acc_test(mut aa: Twim<'static>) {
     let acc_id = [ACCEL_ID_REG];
     let mag_id = [MAGNET_ID_REG];
 
+    //
+    // does not hang
     aa.blocking_write_read(ACCEL_ADDR, &acc_id, &mut acc)
         .unwrap();
+    defmt::println!("{}", acc);
+    // hangs
+    aa.write_read(ACCEL_ADDR, &acc_id, &mut acc).await.unwrap();
+    //
+    //
     defmt::println!("{}", acc);
     aa.blocking_write_read(MAGNET_ADDR, &mag_id, &mut mag)
         .unwrap();
