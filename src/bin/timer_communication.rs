@@ -37,6 +37,7 @@ async fn main(spawner: Spawner) {
         .spawn(get_utf8_msg(CHAR_CHANNEL.receiver()))
         .unwrap();
 }
+
 #[embassy_executor::task]
 pub async fn get_utf8_msg(rec: UarteReceiver) {
     loop {
